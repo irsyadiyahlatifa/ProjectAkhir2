@@ -5,4 +5,7 @@ public enum TrashType { Organik, Plastik, B3 }
 public class Trash : MonoBehaviour
 {
     public TrashType type;
+
+    [HideInInspector]
+    public bool hasScored = false; // 🔥 penting banget
 }

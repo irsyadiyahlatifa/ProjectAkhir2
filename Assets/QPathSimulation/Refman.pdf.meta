@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 148b7d743fc9b9d42968dbf0eeb51f23
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 179747
+  packageName: QPath Traffic Simulator
+  packageVersion: 1.0
+  assetPath: Assets/QPathSimulation/Refman.pdf
+  uploadId: 392147

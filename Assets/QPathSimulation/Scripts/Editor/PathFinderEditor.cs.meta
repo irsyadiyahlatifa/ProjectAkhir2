@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: b600849cdfda82141b4ba85501344091
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 179747
+  packageName: QPath Traffic Simulator
+  packageVersion: 1.0
+  assetPath: Assets/QPathSimulation/Scripts/Editor/PathFinderEditor.cs
+  uploadId: 392147

@@ -8,21 +8,22 @@ public class TrashBin : MonoBehaviour
     {
         Debug.Log("Trigger kena");
 
-        Trash trash = other.GetComponent<Trash>();
+        Trash trash =
+            other.GetComponent<Trash>();
 
-        if (trash != null)
+        if(trash!=null)
         {
-            Debug.Log("Ini sampah");
+            Debug.Log("Sampah masuk");
 
-            if (trash.type == acceptedType)
+            if(trash.type==acceptedType)
             {
                 Debug.Log("BENAR");
-                ScoreManager.instance.AddScore(10);
+                ScoreManager.instance.AddScore(1);
             }
+
             else
             {
                 Debug.Log("SALAH");
-                ScoreManager.instance.AddScore(-5);
             }
 
             Destroy(other.gameObject);

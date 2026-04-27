@@ -7,128 +7,205 @@ public class PlayerController : MonoBehaviour
     [Header("Trash Settings")]
     public Transform holdPoint;
     public Transform throwPoint;
-    public Transform target;
-    public Transform target2;
-    public Transform target3;
+
+    public Transform target;   // Organik
+    public Transform target2;  // Plastik
+    public Transform target3;  // B3
 
     private Transform currentTrash;
-    private bool isHolding = false;
-    private bool isThrowing = false;
 
-    private float t = 0;
+    bool isHolding=false;
+    bool isThrowing=false;
+
+    float t;
+
+    [Header("Camera")]
+    public Transform cam;
+    Vector3 camRotation;
+
+    public int minAngel=-30;
+    public int maxAngel=45;
+    public int sensitivity=200;
+
+
 
     void Update()
     {
+        Rotate();
         Move();
 
-        // lempar pakai SPACE
-        if (isHolding && Input.GetKeyDown(KeyCode.Space))
+        if(isHolding && Input.GetKeyDown(KeyCode.Space))
         {
             ThrowTrash();
         }
 
-        if (isThrowing)
-        {
-            MoveTrashToTarget();
-        }
-
-        // kalau lagi pegang → ikut tangan
-        if (isHolding && currentTrash != null)
+        if(isHolding && currentTrash != null)
         {
             currentTrash.position = holdPoint.position;
         }
+
+        if(isThrowing)
+        {
+            MoveTrashToTarget();
+        }
     }
 
-    // ================= MOVE =================
+
+
     void Move()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        float h=Input.GetAxis("Horizontal");
+        float v=Input.GetAxis("Vertical");
 
-        Vector3 dir = new Vector3(h, 0, v);
-        transform.position += dir * moveSpeed * Time.deltaTime;
+        Vector3 move=
+            transform.forward*v+
+            transform.right*h;
 
-        if (dir != Vector3.zero)
-        {
-            transform.LookAt(transform.position + dir);
-        }
+        transform.position +=
+            move.normalized*
+            moveSpeed*
+            Time.deltaTime;
     }
 
-    // ================= AUTO PICK =================
-    private void OnTriggerEnter(Collider other)
-{
-    Debug.Log("Nabrak: " + other.name);
 
-    if (!isHolding && !isThrowing)
+
+    void Rotate()
     {
-        if (other.CompareTag("Trash"))
+        float mouseX=Input.GetAxis("Mouse X");
+        float mouseY=Input.GetAxis("Mouse Y");
+
+        transform.Rotate(
+            Vector3.up*
+            mouseX*
+            sensitivity*
+            Time.deltaTime
+        );
+
+        camRotation.x -=
+            mouseY*
+            sensitivity*
+            Time.deltaTime;
+
+        camRotation.x=
+            Mathf.Clamp(
+                camRotation.x,
+                minAngel,
+                maxAngel
+            );
+
+        cam.localRotation=
+            Quaternion.Euler(
+                camRotation.x,
+                0,
+                0
+            );
+    }
+
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(!isHolding && !isThrowing)
         {
-            Debug.Log("Ambil sampah!");
+            if(other.CompareTag("Trash"))
+            {
+                Debug.Log("Ambil Sampah");
 
-            currentTrash = other.transform;
+                currentTrash=other.transform;
 
-            Rigidbody rb = currentTrash.GetComponent<Rigidbody>();
-            rb.isKinematic = true;
+                Rigidbody rb=
+                    currentTrash.GetComponent<Rigidbody>();
 
-            isHolding = true;
+                if(rb!=null)
+                {
+                    rb.isKinematic=false;
+                    rb.useGravity=false;
+                }
+
+                isHolding=true;
+            }
         }
     }
-}
 
-    // ================= THROW =================
+
+
     void ThrowTrash()
     {
-        isHolding = false;
-        isThrowing = true;
-        t = 0;
+        if(currentTrash==null)
+            return;
+
+        isHolding=false;
+        isThrowing=true;
+        t=0;
     }
 
-    // ================= ARC THROW =================
+
+
     void MoveTrashToTarget()
-{
-    if (currentTrash == null) return;
-
-    t += Time.deltaTime;
-    float duration = 0.7f;
-    float t01 = t / duration;
-
-    Vector3 A = throwPoint.position;
-
-    // 🔥 tentukan target sesuai jenis sampah
-    Trash trash = currentTrash.GetComponent<Trash>();
-    Transform selectedTarget = target;
-
-    if (trash != null)
     {
-        if (trash.type == TrashType.Organik)
+        if(currentTrash==null)
+            return;
+
+        t += Time.deltaTime;
+
+        float duration=0.8f;
+        float t01=t/duration;
+
+        Vector3 A=throwPoint.position;
+
+        Trash trash=
+            currentTrash.GetComponent<Trash>();
+
+        Transform selectedTarget=target;
+
+        if(trash!=null)
         {
-            selectedTarget = target;
+            if(trash.type==TrashType.Organik)
+                selectedTarget=target;
+
+            if(trash.type==TrashType.Plastik)
+                selectedTarget=target2;
+
+            if(trash.type==TrashType.B3)
+                selectedTarget=target3;
         }
-        else if (trash.type == TrashType.Plastik)
+
+        Vector3 B=selectedTarget.position;
+
+        Vector3 pos=
+            Vector3.Lerp(A,B,t01);
+
+        Vector3 arc=
+            Vector3.up*
+            4f*
+            Mathf.Sin(
+                t01*Mathf.PI
+            );
+
+        currentTrash.position=
+            pos+arc;
+
+
+        if(t01>=1f)
         {
-            selectedTarget = target2;
+            Debug.Log("Masuk target");
+
+            isThrowing=true;
+
+            // paksa tepat masuk bin
+            currentTrash.position=B;
+
+            Rigidbody rb=
+                currentTrash.GetComponent<Rigidbody>();
+
+            if(rb!=null)
+            {
+                // biarkan trigger tong detect dulu
+                rb.isKinematic=true;
+                rb.useGravity=false;
+            }
+
+            currentTrash=null;
         }
-        else if (trash.type == TrashType.B3)
-        {
-            selectedTarget = target3;
-        }
-    }
-
-    Vector3 B = selectedTarget.position;
-
-    Vector3 pos = Vector3.Lerp(A, B, t01);
-    Vector3 arc = Vector3.up * 3 * Mathf.Sin(t01 * Mathf.PI);
-
-    currentTrash.position = pos + arc;
-
-    if (t01 >= 1)
-    {
-        isThrowing = false;
-
-        Rigidbody rb = currentTrash.GetComponent<Rigidbody>();
-        rb.isKinematic = false;
-
-        currentTrash = null;
     }
 }
-    }

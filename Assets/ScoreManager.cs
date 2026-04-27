@@ -1,16 +1,25 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager instance;
 
-    public int score = 0;
-    public Text scoreText;
+    public int collected = 0;
+    public int targetAmount = 10;
+    public TMP_Text scoreText;
 
     void Awake()
     {
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Start()
@@ -19,17 +28,35 @@ public class ScoreManager : MonoBehaviour
     }
 
     public void AddScore(int amount)
-    {
-        score += amount;
-        UpdateUI();
-        Debug.Log("Score sekarang: " + score);
-    }
+{
+    collected += amount;
 
+    if (collected < 0)
+        collected = 0;
+
+    Debug.Log("Target sekarang: " + collected);
+
+    UpdateUI();
+
+    if (collected >= targetAmount)
+    {
+        Debug.Log("MISSION COMPLETE!");
+        Time.timeScale = 0f;
+    }
+}
     void UpdateUI()
     {
         if (scoreText != null)
         {
-            scoreText.text = "Score: " + score;
+            scoreText.text =
+"Target: " +
+collected +
+"/" +
+targetAmount;
+        }
+        else
+        {
+            Debug.LogWarning("Score Text belum di assign!");
         }
     }
 }

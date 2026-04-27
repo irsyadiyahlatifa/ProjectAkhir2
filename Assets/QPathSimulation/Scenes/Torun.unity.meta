@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 94c9435d2ae867942a665461641b4998
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 179747
+  packageName: QPath Traffic Simulator
+  packageVersion: 1.0
+  assetPath: Assets/QPathSimulation/Scenes/Torun.unity
+  uploadId: 392147
